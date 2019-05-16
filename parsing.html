@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <meta charset="utf-8">
+    <script>
+      function request() {
+        var lastName = document.getElementById('lastName').value;
+        var firstName = document.getElementById('firstName').value;
+        var middleName = document.getElementById('middleName').value;
+        var phone = document.getElementById('phone').value;
+        var city = document.getElementById('city').value;
+        var street = document.getElementById('street').value;
+        var nd = document.getElementById('nd').value;
+        var nkv = document.getElementById('nkv').value;
+
+        var xhr = new XMLHttpRequest();
+        var url = 'http://nomer.cc/allukraina/';
+
+        var body = 'lastName=' + encodeURIComponent(lastName) +'&firstName=' + encodeURIComponent(firstName) +'&middleName=' + encodeURIComponent(middleName) +'&phone=' + encodeURIComponent(phone)
+          + '&city=' + encodeURIComponent(city) + '&street=' + encodeURIComponent(street) + '&nd=' + encodeURIComponent(nd) + '&nkv=' + encodeURIComponent(nkv) + '&searchButton=' + encodeURIComponent('Найти');
+
+        xhr.open('POST', url);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var parsedData = document.createElement('html');
+            parsedData.innerHTML = xhr.response;
+            var parsedTable = parsedData.getElementsByClassName('w3-table w3-bordered w3-striped')[0];
+            document.getElementById('table').innerHTML = parsedTable.innerHTML;
+          }
+        }
+
+        xhr.send(body);
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container p-5">
+      <div class="row">
+         <div class="col">
+           <input type="text" class="form-control" id="lastName" placeholder="Фамилия">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="firstName" placeholder="Имя">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="middleName" placeholder="Отчество">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="phone" placeholder="Телефон">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="city" placeholder="Населенный пункт">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="street" placeholder="Улица">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="nd" placeholder="Дом">
+         </div>
+         <div class="col">
+           <input type="text" class="form-control" id="nkv" placeholder="Квартира">
+         </div>
+         <div class="col">
+           <button type="submit" class="btn btn-primary" id="searchButton" onclick="request()">Найти</button>
+         </div>
+       </div>
+    </div>
+    <table class="table p-5" id="table"></table>
+  </body>
+</html>

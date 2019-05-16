@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <meta charset="utf-8">
+    <script>
+      var prime1, prime2, module, enclosedKey;
+
+      function encrypt() {
+        var encryptedText = '';
+        var textToEncrypt = document.getElementById('textToEncrypt').value;
+        if (textToEncrypt.length === 0) {
+          alert ("There is nothing to encrypt");
+          return;
+        }
+        generatePrimes();
+        module = prime1 * prime2;
+        var eulerFunction = (prime1 - 1) * (prime2 - 1);
+        var keys = generateKeys(eulerFunction);
+        openKey = keys.openKey;
+        enclosedKey = keys.enclosedKey;
+        var symbolsToEncrypt = [];
+        for (var i = 0; i < textToEncrypt.length; i++) {
+          symbolsToEncrypt[i] = textToEncrypt.charCodeAt(i);
+        }
+        var encryptedSymbols = [];
+        for (var i = 0; i < textToEncrypt.length; i++) {
+          encryptedSymbols[i] = encryptText(symbolsToEncrypt[i], openKey);
+          encryptedText += String.fromCharCode(encryptedSymbols[i]);
+        }
+        document.getElementById('encryptedText').innerText = encryptedText;
+      }
+
+      function decode() {
+        var decodedText = '';
+        var textToDecode = document.getElementById('encryptedText').value;
+        if (textToDecode.length === 0) {
+          alert ("First you need to encrypt something");
+          return;
+        }
+        var symbolsToDecode = [];
+        for (var i = 0; i < textToDecode.length; i++) {
+          symbolsToDecode[i] = textToDecode.charCodeAt(i);
+        }
+        var decodedSymbols = [];
+        for (var i = 0; i < textToDecode.length; i++) {
+          decodedSymbols[i] = encryptText(symbolsToDecode[i], enclosedKey);
+          decodedText += String.fromCharCode(decodedSymbols[i]);
+        }
+        document.getElementById('decodedText').innerText = decodedText;
+      }
+
+      function eratostheneSieve(keySize) {
+        var primes = [];
+        primes[0] = false;
+        primes[1] = false;
+        for (var i = 2; i < Math.pow(2, keySize); i++) {
+          primes[i] = true;
+        }
+
+        for (var i = 2; i < primes.length; i++) {
+          if (primes[i] === true) {
+            for (var j = 2; i * j < primes.length; j++) {
+              primes[i * j] = false;
+            }
+          }
+        }
+        return primes;
+      }
+
+      function generatePrimes() {
+          var keySize = document.getElementById('keySize').value;
+          var primes = eratostheneSieve(keySize);
+          for (var i = primes.length - 1; i > 0; i--) {
+            if (primes[i] === true) {
+              prime1 = i;
+              for (var j = i - 1; j > 0; j--) {
+                if (primes[j] === true) {
+                  prime2 = j;
+                  break;
+                }
+              }
+              break;
+            }
+          }
+      }
+
+      function generateKeys (m) {
+        var d = m - 1;
+        var e = 1;
+
+        for (var i = 2; i <= m; i++) {
+          if ((m % i === 0) && (d % i === 0)) {
+            d--;
+            i = 1;
+          }
+        }
+
+        while (true) {
+          if ((e * d) % m === 1) {
+
+            break;
+          } else {
+            e++;
+          }
+        }
+        return {
+          openKey: e,
+          enclosedKey: d
+        };
+      }
+
+      function encryptText(x, key) {
+        var encryptedText = x % module;
+        for (var i = 1; i < key; i++) {
+          encryptedText *= x;
+          if (encryptedText > module) {
+            encryptedText %= module;
+          }
+        }
+        return encryptedText;
+      }
+
+
+    </script>
+  </head>
+  <body>
+    <div class="alert alert-success">
+      <h1 class="alert-heading">Encryption</h1>
+      <label>Key size, Bits:</label>
+      <input type="number" value="2" min="2" max="8" id="keySize">
+      <label>Your message:</label>
+      <input type="text" id="textToEncrypt">
+      <button type="button" class="btn btn-primary" onclick="encrypt()">Encrypt</button>
+      <p>Encrypted Text: <output id="encryptedText"></output></p>
+      <button type="button" class="btn btn-primary" onclick="decode()">Decode</button>
+      <p>Decoded Text: <output id="decodedText"></output></p>
+    </div>
+  </body>
+</html>
